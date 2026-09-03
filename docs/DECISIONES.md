@@ -31,6 +31,7 @@ la documentación.
 | D-13 | La web se aloja en GitHub Pages | Cerrada |
 | D-14 | Solo librerías con licencia permisiva | Cerrada |
 | D-15 | El QR mide 20 mm y va en la banda sobre el cajetín | Cerrada · ensayo en papel superado |
+| D-16 | Accesos directos, no ficheros `.bat` | Cerrada |
 
 ---
 
@@ -480,6 +481,56 @@ propio corto sube el módulo a 0,65 mm sin tocar nada más.
 **La herramienta avisa sola.** Si el módulo baja del umbral configurado, la emisión
 sigue adelante pero imprime una advertencia con el tamaño real y el que haría falta. No
 falla en silencio.
+
+---
+
+## D-16 · Accesos directos, no ficheros `.bat`
+
+**Decisión.** La herramienta se usa desde dos accesos directos (`Emitir plano.lnk` y
+`Publicar en la web.lnk`) que apuntan a `python.exe`. No hay ficheros `.bat`.
+
+**Por qué.** Se construyeron primero como `.bat`, que es lo natural para arrastrar un
+fichero encima. No funcionaron: **en el Windows corporativo de INES está prohibido
+ejecutar `.bat`.** Al arrastrar el PDF, Windows responde:
+
+> «Windows no tiene acceso al dispositivo, ruta de acceso o archivo especificado.
+> Puede que no tenga los permisos apropiados para tener acceso al elemento.»
+
+Se comprobó que no era un problema del fichero: **un `.bat` de dos líneas que solo hace
+`echo` falla igual**, con «Acceso denegado». Se descartaron una por una las causas
+habituales:
+
+| Sospecha | Comprobación |
+|---|---|
+| Marca de «fichero descargado» | No hay flujos alternativos en el fichero |
+| Permisos de la carpeta | `INTRANET\pia` tiene control total |
+| Reglas ASR de Defender | Ninguna configurada |
+| Asociación de `.bat` rota | Correcta (`batfile="%1" %*`) |
+| Codificación del fichero | ASCII plano, sin BOM |
+| Que falte `cmd.exe` | Existe |
+
+Queda por tanto una **política del equipo** que bloquea la ejecución de scripts `.bat`,
+que es exactamente el tipo de restricción que había que prever en un entorno
+corporativo.
+
+**La solución.** Un acceso directo **no es un script**: es un puntero a un ejecutable,
+y `python.exe` sí está permitido (se comprobó). Y conserva lo único que hacía falta:
+**arrastrar un fichero sobre un acceso directo le pasa su ruta como argumento**, igual
+que con un `.bat`.
+
+**Consecuencias:**
+
+- La lógica de publicar, que estaba escrita en el `.bat`, se ha reescrito en Python
+  (`src/control_planos/publicar.py`). Mejor sitio: ahora se puede probar.
+- La herramienta acepta `--pausar`, que espera a que se pulse Intro antes de cerrar.
+  Sin eso, al lanzarse desde el explorador la ventana se cerraría de golpe y no se
+  leería el resultado.
+- Los `.lnk` llevan rutas absolutas, así que **no se suben al repositorio**. En un
+  puesto nuevo se regeneran con `py crear_accesos.py`, que también deja constancia de
+  por qué existen.
+
+**Lección que conviene recordar.** El entorno de destino no se supone: se prueba. Este
+fallo no lo habría detectado ningún test, porque no está en el código.
 
 ---
 

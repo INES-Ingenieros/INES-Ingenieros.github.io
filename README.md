@@ -124,7 +124,9 @@ a la dirección: `http://127.0.0.1:8765/?p=DEMO-101-R00`.
 ├── src/control_planos/    la herramienta de emisión
 ├── config/config.yaml     configuración
 ├── tests/                 80 tests
-├── emitir.bat             lanzador: se le arrastra el PDF encima
+├── crear_accesos.py       crea los accesos directos (una vez por puesto)
+├── Emitir plano.lnk       se le arrastra el PDF encima
+├── Publicar en la web.lnk doble clic para subir a la web
 ├── muestras/              planos reales de ejemplo (NO se sube al repositorio)
 └── .venv/                 entorno virtual de Python (NO se sube)
 ```

@@ -21,3 +21,7 @@ dist/
 # Copias de seguridad del registro
 *.json.bak
 *.json.tmp
+
+# Accesos directos: apuntan a rutas absolutas de cada ordenador.
+# En un puesto nuevo se regeneran con:  py crear_accesos.py
+*.lnk

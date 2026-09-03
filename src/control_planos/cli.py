@@ -3,8 +3,10 @@
 Es solo una puerta de entrada al motor de `control_planos.emision`. Hay dos
 formas de usarla y las dos acaban en el mismo sitio:
 
-* **Arrastrando el PDF** sobre ``emitir.bat``: la herramienta pregunta lo que
-  falta, una cosa a la vez. Pensada para quien no vive en la consola.
+* **Arrastrando el PDF** sobre el acceso directo «Emitir plano»: la herramienta
+  pregunta lo que falta, una cosa a la vez. Pensada para quien no vive en la
+  consola. Es un acceso directo y no un ``.bat`` porque en los puestos de INES
+  esta prohibido ejecutar ``.bat`` (ver ``docs/DECISIONES.md``, D-16).
 * **Con parámetros**, para trabajar rápido o para automatizar:
 
       python -m control_planos.cli plano.pdf --obra SESENA \
@@ -267,6 +269,12 @@ def construir_parser() -> argparse.ArgumentParser:
              "determina si se puede leer en papel.",
     )
     p.add_argument("-v", "--verbose", action="store_true", help="Traza detallada")
+    p.add_argument(
+        "--pausar", action="store_true",
+        help="Espera a que se pulse Intro antes de cerrar. Lo usan los accesos "
+             "directos del escritorio: al lanzarse desde el explorador, la "
+             "ventana se cerraria de golpe y no se leeria el resultado.",
+    )
     return p
 
 
@@ -313,5 +321,20 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
+def _con_pausa(argv: list[str] | None = None) -> int:
+    """`main` envuelto en una espera final, para lanzarlo desde el explorador."""
+    try:
+        codigo = main(argv)
+    except SystemExit as exc:
+        codigo = int(exc.code or 0)
+    if "--pausar" in (sys.argv[1:] if argv is None else argv):
+        print()
+        try:
+            input("  Pulsa Intro para cerrar esta ventana. ")
+        except (EOFError, KeyboardInterrupt):
+            pass
+    return codigo
+
+
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(_con_pausa())

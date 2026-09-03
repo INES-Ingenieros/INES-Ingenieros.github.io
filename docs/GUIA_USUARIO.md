@@ -96,14 +96,21 @@ y corto en lugar de una ristra de letras y números al azar.
 
 # Parte 2 · Eres quien emite los planos
 
-Todo se hace con **dos ficheros, a doble clic**. No hace falta saber Python ni git.
+Todo se hace con **dos accesos directos**. No hace falta saber Python ni git.
 Están los dos en la carpeta del proyecto:
 
 ```
 C:\Users\pia.INTRANET\projects\00_CONTROL_PLANOS\
-    emitir.bat      <- paso 1: mete el QR en el plano
-    publicar.bat    <- paso 2: sube la revision a la web
+    Emitir plano.lnk         <- paso 1: mete el QR en el plano
+    Publicar en la web.lnk   <- paso 2: sube la revision a la web
 ```
+
+> **Si no están ahí** (ordenador nuevo, o carpeta recién copiada), se crean una sola
+> vez abriendo una consola en esa carpeta y ejecutando `py crear_accesos.py`.
+>
+> Son accesos directos y no ficheros `.bat` porque en los ordenadores de INES está
+> prohibido ejecutar `.bat`: dan «Acceso denegado». Está explicado en el registro de
+> decisiones, D-16.
 
 ## Lo que no cambia en tu trabajo
 
@@ -117,7 +124,7 @@ C:\Users\pia.INTRANET\projects\00_CONTROL_PLANOS\
 ## Paso 1 · Meter el QR en el plano
 
 1. Abre la carpeta `00_CONTROL_PLANOS` en el explorador de Windows.
-2. **Arrastra el PDF ploteado encima de `emitir.bat`** y suéltalo.
+2. **Arrastra el PDF ploteado encima de «Emitir plano»** y suéltalo.
 3. Se abre una ventana negra que te va preguntando, **una cosa a la vez**:
 
 | Te pregunta | Qué contestar |
@@ -148,7 +155,7 @@ Puedes emitir varios planos seguidos antes de pasar al paso 2.
 QR impreso, pero la web todavía no sabe que esa revisión existe: al escanearlo saldría
 «CÓDIGO NO VÁLIDO».
 
-1. **Doble clic en `publicar.bat`.**
+1. **Doble clic en «Publicar en la web».**
 2. Te enseña qué revisiones va a publicar y te pide confirmación. Escribe `S` e Intro.
 3. La web tarda uno o dos minutos en actualizarse. A partir de ahí, los QR responden.
 
@@ -157,7 +164,7 @@ todavía no funcionan** y de que hay que volver a ejecutarlo. No se queda callad
 
 ## Las tres reglas que hay que respetar
 
-**1. Solo se imprime lo que ha pasado por `emitir.bat`.**
+**1. Solo se imprime lo que ha pasado por «Emitir plano».**
 Un plano sin QR no se puede comprobar en obra, y ese es justo el problema que estamos
 resolviendo. Si un plano sale a obra sin pasar por aquí, el sistema no ha fallado: se
 ha esquivado.
@@ -188,10 +195,11 @@ subido por error aparezca en obra como plano bueno.
 
 | Síntoma | Qué significa |
 |---|---|
+| «Windows no tiene acceso al dispositivo...» | Estás usando un `.bat`. Usa los accesos directos; ver D-16 |
 | «MODO PRUEBA» al emitir | Falta `url_base` en `config/config.yaml`. Los planos saldrán marcados como PRUEBA y no valen para obra |
 | «la revisión R00 ya está registrada» | Esa revisión ya se emitió. Si de verdad hay que rehacerla, avisa: hay que retirarla del registro a mano y a conciencia, porque su QR puede estar ya impreso |
 | «el módulo del QR sale de 0,54 mm» | Es un aviso, no un error. Se ha comprobado que a ese tamaño se lee bien. Solo importaría si alguien alargase la dirección de la web |
-| `publicar.bat` dice que no hay nada | No se ha emitido nada nuevo desde la última publicación |
+| «Publicar en la web» dice que no hay nada | No se ha emitido nada nuevo desde la última publicación |
 | En obra sale «CÓDIGO NO VÁLIDO» en un plano recién emitido | Falta el paso 2: no se ha publicado |
 
 ---
@@ -229,7 +237,7 @@ expresamente para soportarlo, y esa fue una de las decisiones de diseño más im
 que se tomaron.
 
 **¿Cómo se añade una obra nueva?**
-No hay que preparar nada. La primera vez que emitas un plano de esa obra, `emitir.bat`
+No hay que preparar nada. La primera vez que emitas un plano de esa obra, «Emitir plano»
 te pedirá su código, su nombre y su expediente, y la da de alta sola. Aparecerá como un
 bloque nuevo en el listado de la web.
 
