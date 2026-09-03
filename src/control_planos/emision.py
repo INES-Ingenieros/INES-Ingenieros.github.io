@@ -111,6 +111,19 @@ def emitir(peticion: Peticion, cfg: Config) -> Emision:
 
     # 2 y 3 · Registro en memoria. Aquí se decide el correlativo.
     registro = Registro.cargar(cfg.ruta_registro, cfg.correlativo_inicial)
+
+    if cfg.resellar:
+        # Volver a sellar solo vale sobre algo ya registrado. Si no, se estaría
+        # produciendo un plano con aspecto de válido que la web no reconoce.
+        doc = registro.buscar_por_denominacion(peticion.obra, peticion.denominacion)
+        rev = f"{int(peticion.revision):02d}"
+        if not doc or not any(r.get("rev") == rev for r in doc.get("revisiones", [])):
+            raise ValueError(
+                f"no se puede volver a sellar la R{rev} de "
+                f"«{peticion.denominacion}»: esa revisión no consta en el "
+                "registro. Emítela normalmente, sin --resellar."
+            )
+
     registro.asegurar_obra(
         peticion.obra,
         nombre=peticion.nombre_obra or None,
@@ -126,10 +139,9 @@ def emitir(peticion: Peticion, cfg: Config) -> Emision:
         n_indice=peticion.n_indice,
         hojas=hojas,
         motivo=peticion.motivo,
-        # En modo prueba el registro no se guarda, asi que no hay razon para
-        # impedir re-sellar una revision ya emitida: es justo lo que hace falta
-        # para reimprimir una hoja de ensayo.
-        permitir_repetida=cfg.modo_prueba,
+        # En modo prueba y al re-sellar el registro no se guarda, asi que no hay
+        # razon para impedir una revision ya emitida.
+        permitir_repetida=cfg.modo_prueba or cfg.resellar,
     )
 
     # 4 y 5 · Dirección y QR.
@@ -149,7 +161,7 @@ def emitir(peticion: Peticion, cfg: Config) -> Emision:
     )
 
     # 7 · El registro se persiste al final, cuando ya hay PDF sellado.
-    if not cfg.modo_prueba:
+    if not cfg.modo_prueba and not cfg.resellar:
         registro.guardar()
     else:
         log.warning(
@@ -158,6 +170,13 @@ def emitir(peticion: Peticion, cfg: Config) -> Emision:
         )
 
     avisos = list(res.avisos)
+    if cfg.resellar:
+        avisos.insert(
+            0,
+            "Re-sellado. Se ha vuelto a generar el PDF de una revisión ya "
+            "registrada; el registro no se ha modificado. El QR es idéntico al "
+            "del PDF original, así que este plano es igual de válido.",
+        )
     if cfg.modo_prueba:
         avisos.insert(
             0,

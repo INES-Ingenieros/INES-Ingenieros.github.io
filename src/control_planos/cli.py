@@ -262,6 +262,12 @@ def construir_parser() -> argparse.ArgumentParser:
     p.add_argument("--fecha", help="Fecha de emisión AAAA-MM-DD (por defecto, hoy)")
     p.add_argument("--config", help="Ruta alternativa del config.yaml")
     p.add_argument(
+        "--resellar", action="store_true",
+        help="Vuelve a generar el PDF sellado de una revision YA registrada, "
+             "sin duplicarla y sin tocar el registro. Para cuando el fichero "
+             "sellado se ha perdido o hace falta otra copia.",
+    )
+    p.add_argument(
         "--prueba", action="store_true",
         help="Sella como PRUEBA y no toca el registro, aunque la dirección de "
              "la web esté configurada. Es lo que hay que usar para el ensayo "
@@ -296,6 +302,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.prueba:
         cfg = dataclasses.replace(cfg, forzar_prueba=True)
+    if args.resellar:
+        cfg = dataclasses.replace(cfg, resellar=True)
 
     _titulo("CONTROL DE PLANOS - EMISION")
     if cfg.modo_prueba:

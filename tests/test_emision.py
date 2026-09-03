@@ -216,3 +216,31 @@ class TestDatosDeLaObra:
         emitir(p, cfg)
         reg = Registro.cargar(cfg.ruta_registro)
         assert reg.obras["SESENA"]["nombre"] == "SESENA"
+
+
+class TestResellar:
+    """Volver a generar el PDF de una revisión ya emitida, sin duplicarla."""
+
+    def test_reproduce_el_mismo_codigo_sin_tocar_el_registro(self, pdf_a3, cfg):
+        emitir(_peticion(pdf_a3(hojas=2)), cfg)
+        antes = cfg.ruta_registro.read_text(encoding="utf-8")
+        cfg2 = dataclasses.replace(cfg, resellar=True)
+        em = emitir(_peticion(pdf_a3(hojas=2, nombre="otra_copia.pdf")), cfg2)
+        assert str(em.codigo) == "SESENA-101-R00"
+        assert cfg.ruta_registro.read_text(encoding="utf-8") == antes
+
+    def test_no_lleva_marca_de_prueba(self, pdf_a3, cfg):
+        """Es un plano válido, no un ensayo: el QR es idéntico al original."""
+        emitir(_peticion(pdf_a3(hojas=1)), cfg)
+        cfg2 = dataclasses.replace(cfg, resellar=True)
+        em = emitir(_peticion(pdf_a3(hojas=1, nombre="copia.pdf")), cfg2)
+        texto = (PdfReader(em.pdf).pages[0].extract_text() or "").replace("\n", "")
+        assert "PRUEBA" not in texto
+        assert not em.modo_prueba
+
+    def test_falla_si_la_revision_no_esta_registrada(self, pdf_a3, cfg):
+        """Si no, se produciría un plano con aspecto de válido que la web no
+        reconoce, que es justo lo que el sistema existe para evitar."""
+        cfg2 = dataclasses.replace(cfg, resellar=True)
+        with pytest.raises(ValueError, match="no consta en el registro"):
+            emitir(_peticion(pdf_a3(hojas=1)), cfg2)

@@ -49,6 +49,18 @@ class Config:
     corto y el ensayo mediría algo que no es.
     """
 
+    resellar: bool = False
+    """Volver a generar el PDF sellado de una revision YA registrada.
+
+    No toca el registro y no estampa la marca de PRUEBA: produce exactamente
+    el mismo PDF que se produjo al emitirla, porque el codigo es determinista.
+    Sirve para cuando el fichero sellado se ha perdido o hace falta otra copia.
+
+    Solo funciona sobre una revision que ya conste en el registro. Si no
+    constase, se estaria produciendo un plano con aspecto de valido que la web
+    no reconoce, y eso es justo lo que el sistema existe para evitar.
+    """
+
     @property
     def modo_prueba(self) -> bool:
         """¿No se debe considerar válido lo que salga?
