@@ -1,4 +1,4 @@
-"""Lectura y escritura del registro de planos (``web/planos.json``).
+"""Lectura y escritura del registro de planos (``planos.json``).
 
 El registro es la única fuente de verdad sobre qué revisión está vigente. Es el
 mismo fichero que consume la web pública, así que su forma está fijada por lo

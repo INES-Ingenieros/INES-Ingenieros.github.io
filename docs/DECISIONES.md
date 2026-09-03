@@ -98,10 +98,12 @@ Ver D-11 sobre qué información queda visible.
 
 ## D-03 · La web es una página estática con un fichero de datos. Sin base de datos
 
-**Decisión.** La web se compone de una página HTML y un fichero de datos
-(`planos.json`) con el listado de planos y revisiones. La comparación entre lo que
-dice el QR y lo que está vigente **la hace el propio navegador del móvil**. No hay
-servidor, ni base de datos, ni programa ejecutándose en la nube.
+**Decisión.** La web se compone de una página HTML (`index.html`) y un fichero de
+datos con el listado de planos y revisiones (`planos.json`). Los dos van en la
+**raíz del repositorio**, porque GitHub Pages publica la raíz y el QR impreso
+apunta a la raíz del dominio. La comparación entre lo que dice el QR y lo que está
+vigente **la hace el propio navegador del móvil**. No hay servidor, ni base de
+datos, ni programa ejecutándose en la nube.
 
 **Por qué.** Lo que hay que publicar son unos cientos de filas, de solo lectura, que
 cambian cuando se emite un plano. Eso es un fichero, no una base de datos. Las

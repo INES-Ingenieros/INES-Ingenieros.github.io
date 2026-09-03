@@ -51,5 +51,7 @@ correlativo_inicial: 101
 # ── Rutas ─────────────────────────────────────────────────────────────────
 # Relativas a la raíz del proyecto.
 rutas:
-  registro: "web/planos.json"
+  # En la raiz, no en una subcarpeta: GitHub Pages publica la raiz del
+  # repositorio, y el QR impreso apunta a la raiz del dominio.
+  registro: "planos.json"
   salida: "salida"

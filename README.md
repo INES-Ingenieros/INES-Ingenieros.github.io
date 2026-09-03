@@ -76,31 +76,34 @@ vigente. Se explica en [docs/DECISIONES.md](docs/DECISIONES.md), decisión D-02.
 
 ## Estado actual
 
-**El diseño está cerrado. La web de verificación está hecha y probada. Falta la
-herramienta que estampa el QR.**
+**El sistema está funcionando de principio a fin.** Web publicada, herramienta
+construida y QR validado en papel con un móvil real.
 
-Lo que ya está decidido y validado contra un plano real:
+Hecho:
 
 - [x] Dónde viven los PDF (SharePoint) y quién puede consultar la web (todo el mundo)
-- [x] Cómo se estampa el QR y en qué punto exacto de la hoja
-- [x] Qué unidad se controla (el documento, no la hoja suelta)
-- [x] Cómo se identifica cada plano y cada revisión
-- [x] Qué campos guarda el registro
-- [x] **La web de verificación** (`web/`), probada en los cuatro casos: vigente,
-      superado, código no válido y revisión desconocida
+- [x] Cómo se identifica cada plano y cada revisión, y qué guarda el registro
+- [x] **La web de verificación**, probada en los cuatro casos: vigente, superado,
+      código no válido y revisión desconocida
+- [x] Colores, tipografía y logotipo corporativos de INES
+- [x] **La herramienta de emisión**: estampa el QR en todas las hojas del PDF y
+      mantiene el registro. 80 tests
+- [x] **Ensayo en papel superado**: el QR de 20 mm se lee bien impreso a tamaño real
+- [x] **Publicada** en `https://ines-ingenieros.github.io`
+- [x] Primer plano emitido de verdad: `SESENA-101-R00`, 4 hojas
 
 Lo que falta:
 
-- [ ] Construir la herramienta que estampa el QR y actualiza el registro
-- [ ] Crear la organización de INES en GitHub y publicar la web (ver D-13)
-- [ ] Aplicar los colores y el logotipo de INES a la página
-- [ ] Probarlo de principio a fin con un plano real y un móvil de verdad, al sol
+- [ ] Repetir el ensayo del QR **sobre una fotocopia** y con un móvil viejo, que es
+      lo que de verdad circula por la obra
+- [ ] Decidir si la emisión se dispara desde SharePoint en vez de a mano (ver D-04)
 - [ ] Decidir cómo se replica en las siguientes obras
+- [ ] Alojar la tipografía Montserrat en el repositorio, para no depender de Google
 
 ### Ver la web en local
 
 ```bash
-python -m http.server 8765 --directory web
+python -m http.server 8765
 ```
 
 Y abrir `http://127.0.0.1:8765`. Para probar un veredicto concreto, añadir el código
@@ -114,16 +117,25 @@ a la dirección: `http://127.0.0.1:8765/?p=DEMO-101-R00`.
 ├── docs/
 │   ├── DECISIONES.md      registro de decisiones y su justificación
 │   └── GUIA_USUARIO.md    guía de uso
-├── web/                   la web pública de verificación
-│   ├── index.html         la página (sin dependencias externas)
-│   └── planos.json        el registro de planos y revisiones
+├── index.html             la web pública de verificación
+├── planos.json            el registro de planos y revisiones
+├── logo-ines.svg          logotipo corporativo (vectorial)
+├── .nojekyll              desactiva el procesado de Jekyll en GitHub Pages
+├── src/control_planos/    la herramienta de emisión
+├── config/config.yaml     configuración
+├── tests/                 80 tests
+├── emitir.bat             lanzador: se le arrastra el PDF encima
 ├── muestras/              planos reales de ejemplo (NO se sube al repositorio)
 └── .venv/                 entorno virtual de Python (NO se sube)
 ```
 
-La carpeta `web/` es lo único que se publica en GitHub Pages. La página no carga
-ninguna librería externa: es un solo fichero HTML con su CSS y su JavaScript dentro,
-para que abra al instante y funcione con mala cobertura.
+**Los ficheros de la web van en la raíz del repositorio, no en una subcarpeta.** No es
+una elección de estilo: GitHub Pages publica la raíz, y el QR impreso apunta a la raíz
+del dominio (`https://ines-ingenieros.github.io/?p=...`). Si `index.html` estuviera en
+`web/`, la dirección tendría que ser `.../web/?p=...`, más larga y con el QR más denso.
+
+La página no carga ninguna librería externa: es un solo fichero HTML con su CSS y su
+JavaScript dentro, para que abra al instante y funcione con mala cobertura.
 
 > **Aviso importante.** La carpeta `muestras/` contiene documentación de cliente y
 > está excluida del repositorio en `.gitignore`. Este repositorio va a ser público,

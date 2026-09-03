@@ -37,7 +37,7 @@ class Config:
     correlativo_inicial: int = 101
     modulo_minimo_mm: float = 0.60
     colocacion: Colocacion = field(default_factory=Colocacion)
-    ruta_registro: Path = RAIZ / "web" / "planos.json"
+    ruta_registro: Path = RAIZ / "planos.json"
     ruta_salida: Path = RAIZ / "salida"
 
     forzar_prueba: bool = False
@@ -116,6 +116,6 @@ def cargar(ruta: str | Path | None = None) -> Config:
         correlativo_inicial=correlativo,
         modulo_minimo_mm=float(est.get("modulo_minimo_mm", 0.60)),
         colocacion=col,
-        ruta_registro=RAIZ / str(rutas.get("registro", "web/planos.json")),
+        ruta_registro=RAIZ / str(rutas.get("registro", "planos.json")),
         ruta_salida=RAIZ / str(rutas.get("salida", "salida")),
     )
