@@ -6,16 +6,33 @@
 <title>Control de planos · INES Ingenieros Consultores</title>
 <meta name="description" content="Comprobación de la vigencia de planos de obra.">
 
-<!-- Montserrat es la tipografía corporativa. Se carga con display=swap: el texto
-     aparece al instante con la tipografía del sistema y cambia a Montserrat cuando
-     llega. Sin cobertura, la página se lee igual con la del sistema.
-     MEJORA PENDIENTE: alojar el .woff2 en este mismo repositorio, para no depender
-     de Google y para que funcione totalmente sin conexión. -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
-
 <style>
+/* Montserrat es la tipografía corporativa de INES. El fichero está alojado en
+   este mismo repositorio, no en Google Fonts. Dos motivos:
+
+   1. No depender de nadie. Si Google Fonts no responde —cobertura mala, un
+      cortafuegos corporativo, un cambio suyo— la página seguiría funcionando
+      pero dejaría de parecerse a los documentos de INES.
+   2. Privacidad. Cargarla de Google implicaría que la IP de cada persona que
+      escanea un plano llegue a Google. En una página pública que usa gente de
+      obra eso es innecesario, y hay resoluciones europeas que lo consideran
+      incompatible con el RGPD sin consentimiento previo.
+
+   Es una fuente variable: un solo fichero de 38 KB cubre los pesos 400 a 700.
+   Licencia SIL Open Font License 1.1, que permite redistribuirla; el texto
+   completo está en LICENCIA-MONTSERRAT.txt, como exige la propia licencia. */
+@font-face{
+  font-family:"Montserrat";
+  src:url("montserrat.woff2") format("woff2");
+  font-weight:400 700;
+  font-style:normal;
+  font-display:swap;   /* el texto sale al instante con la del sistema y cambia
+                          a Montserrat en cuanto llega: nunca hay hueco en blanco */
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,
+                U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,
+                U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
    PALETA CORPORATIVA INES
    Tomada de Q:\32_PLANTILLAS_DOCUMENTOS_INES-2024\2. PROYECTOS\ESPAÑOL\
