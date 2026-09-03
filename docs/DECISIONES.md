@@ -33,6 +33,7 @@ la documentación.
 | D-15 | El QR mide 20 mm y va en la banda sobre el cajetín | Cerrada · ensayo en papel superado |
 | D-16 | Accesos directos, no ficheros `.bat` | Cerrada |
 | D-17 | Se estampa solo el QR, sin el código en texto | Cerrada |
+| D-18 | La automatización va por Power Automate, no por Graph | **Abierta**: falta despliegue en Azure |
 
 ---
 
@@ -581,6 +582,57 @@ falta para reimprimir una hoja de ensayo.
 
 ---
 
+## D-18 · La automatización va por Power Automate, no por Microsoft Graph
+
+**Decisión.** Cuando se automatice la emisión, la orquestación la hace **Power Automate**
+con su conector de SharePoint. La única pieza fuera es un servicio de estampado en Azure
+Functions, sin acceso a nada.
+
+**Por qué se cambió de idea.** El primer planteamiento fue un servicio propio que
+hablase con SharePoint por Microsoft Graph. Eso exigía un **registro de aplicación en
+Entra ID** con permisos sobre las bibliotecas del tenant: una petición grande, difícil
+de justificar y que probablemente requiere consentimiento de administrador.
+
+Al revisarlo apareció que era innecesario. Power Automate, que **ya está incluido en el
+M365 de INES**, sabe hacer todo el circuito con una conexión de usuario normal:
+
+| Paso | ¿Power Automate? |
+|---|---|
+| Detectar el plano nuevo con los datos rellenos | Sí |
+| Leer el PDF y las columnas del formulario | Sí |
+| Asignar el correlativo sin colisiones | Sí, con una lista de SharePoint |
+| **Estampar el QR en el PDF** | **No** |
+| Sustituir el fichero por el sellado y marcar el estado | Sí |
+| Publicar el registro en la web | Sí |
+
+Solo falla en una casilla. Y esa casilla se resuelve con un endpoint que **recibe un PDF
+y devuelve un PDF**, sin permisos, sin almacenamiento y sin credenciales.
+
+**Consecuencia importante para el registro.** Con varios emisores, la verdad del registro
+se mueve a una **lista de SharePoint**. Es obligatorio, no cosmético: el correlativo se
+asigna leyendo el registro y sumando uno, así que con copias locales en varios puestos
+dos personas asignarían el mismo número, y eso rompe la D-08. SharePoint gestiona la
+concurrencia; de ahí Power Automate regenera el `planos.json` y lo publica.
+
+**Por qué no un alojamiento gratuito de terceros para el estampado.** Sería gratis, pero
+los planos del cliente saldrían del tenant de Microsoft hacia un proveedor ajeno. Los
+documentos ya viven en SharePoint: con una Azure Function **no salen de la nube de
+Microsoft** en ningún momento. Es documentación de obra de un cliente público.
+
+**Por qué no un PC de la oficina.** Lanzar procesos en un equipo desde Power Automate
+requiere licencia Premium, y ese equipo no podría apagarse nunca.
+
+**Estado.** INES tiene suscripción de Azure. Falta el despliegue, que se ha pedido con
+`docs/PETICION_AZURE.md`. Mientras no exista, el sistema funciona en modo manual: la
+herramienta local sella y publica, con una sola persona emitiendo.
+
+**Y esto es lo que hace que nada de lo hecho sea trabajo tirado:** las columnas de la
+biblioteca, el registro, el identificador y el módulo de estampado son **los mismos** en
+el modo manual y en el automático. La automatización sustituye a la persona que ejecuta
+la herramienta, no al sistema.
+
+---
+
 ## Pendiente de decidir
 
 Cosas identificadas pero todavía sin resolver. Se irán incorporando a este documento a
@@ -590,7 +642,8 @@ medida que se cierren.
 |---|---|
 | Cuenta de GitHub | Crear la organización de INES en GitHub. El repositorio debe ser el sitio raíz (`inesingenieros.github.io`), no uno con nombre, para que la dirección sea corta (ver D-15) |
 | Ensayo sobre fotocopia | El QR ya se ha validado sobre impresión directa. Falta probarlo sobre una fotocopia y con un móvil viejo (ver D-15) |
-| Disparador automático | Si la emisión se lanza desde SharePoint en vez de a mano. Viable, pero el disparador no puede ser «ha aparecido un fichero» (ver D-04) |
+| Despliegue en Azure | Falta que se despliegue el servicio de estampado. Petición redactada en `PETICION_AZURE.md` (ver D-18) |
+| Columnas de la biblioteca | Crear en la biblioteca `Planos` las columnas obligatorias del formulario. Sirven igual en modo manual y automático |
 | Tipografía alojada | Montserrat se carga hoy de Google. Alojar el `.woff2` en el repositorio quitaría esa dependencia |
 | Replicación entre obras | Cómo se configura una obra nueva sin repetir el montaje a mano cada vez. La vía correcta es un tipo de contenido centralizado en SharePoint, no recrear las columnas una por una |
 | Planos ya emitidos | Qué revisión se asigna a los planos que ya están en obra sin QR |

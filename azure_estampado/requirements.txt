@@ -1,0 +1,8 @@
+# Dependencias del servicio de estampado.
+#
+# El paquete se instala directamente desde el repositorio publico del proyecto,
+# para que no haya una copia duplicada del codigo que se pueda desincronizar.
+# Es el mismo modulo que se usa en local.
+azure-functions
+
+control-planos @ git+https://github.com/INES-Ingenieros/INES-Ingenieros.github.io.git@main
