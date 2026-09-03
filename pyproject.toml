@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "control-planos"
+version = "0.1.0"
+description = "Control de revisiones de planos de obra mediante código QR"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "INES Ingenieros Consultores" }]
+
+# Todas con licencia permisiva (BSD/MIT). Se ha evitado deliberadamente
+# PyMuPDF, más cómoda para esto pero con licencia AGPL. Ver DECISIONES.md D-14.
+dependencies = [
+    "pypdf>=6.16,<7",
+    "reportlab>=4.4,<5",
+    "qrcode>=8.2,<9",
+    "pillow>=11",
+    "PyYAML>=6,<7",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.4", "pdfplumber>=0.11"]
+
+[project.scripts]
+control-planos = "control_planos.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q"

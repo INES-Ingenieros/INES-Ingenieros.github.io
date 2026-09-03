@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Control de planos · INES Ingenieros Consultores</title>
+<meta name="description" content="Comprobación de la vigencia de planos de obra.">
+
+<!-- Montserrat es la tipografía corporativa. Se carga con display=swap: el texto
+     aparece al instante con la tipografía del sistema y cambia a Montserrat cuando
+     llega. Sin cobertura, la página se lee igual con la del sistema.
+     MEJORA PENDIENTE: alojar el .woff2 en este mismo repositorio, para no depender
+     de Google y para que funcione totalmente sin conexión. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   PALETA CORPORATIVA INES
+   Tomada de Q:\32_PLANTILLAS_DOCUMENTOS_INES-2024\2. PROYECTOS\ESPAÑOL\
+   memoria A3_esp.docx (esquema de color del tema).
+   ═══════════════════════════════════════════════════════════════════════ */
+:root{
+  --navy:   #101325;   /* dk1     · color del logotipo */
+  --azul:   #2392D1;   /* accent1 · azul INES, el punto de la «i» */
+  --slate:  #374852;   /* accent3 */
+  --gris:   #F2F2F2;   /* lt2 */
+  --tenue:  #8E9098;
+  --linea:  #E2E4E8;
+  --texto:  #101325;
+  --fondo:  #FFFFFF;
+
+  /* Veredicto. El rojo es el corporativo (accent6). El verde no existe en la
+     paleta de INES y no debe existir: es una señal de seguridad, no de marca. */
+  --ok: #0F7A3D;  --ok-fondo: #EAF5EE;
+  --no: #D1242A;  --no-fondo: #FCECEC;
+  --nd: #7F7F7F;  --nd-fondo: #F2F2F2;
+
+  --tipo: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Arial, sans-serif;
+
+  color-scheme: light;   /* se fija claro: se lee mucho mejor al sol */
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--fondo); color:var(--texto);
+  font:400 16px/1.6 var(--tipo);
+  display:flex; flex-direction:column; min-height:100vh;
+}
+
+/* ── Cabecera: blanca y sobria, como la web de INES ─────────────────── */
+header{
+  background:#fff; border-top:3px solid var(--azul);
+  border-bottom:1px solid var(--linea);
+  padding:16px 20px; display:flex; align-items:center; gap:14px;
+  flex-wrap:wrap;
+}
+/* Logotipo oficial, extraído de la plantilla corporativa
+   (memoria A3_esp.docx → word/media/image4.svg). Vectorial: nítido a cualquier
+   tamaño y pesa 2 KB. La versión en blanco para fondos oscuros está en
+   logo-ines-blanco.svg, por si algún día hace falta. */
+.logo{display:block; height:30px; width:auto}
+header .rotulo{
+  font-size:11px; font-weight:500; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--tenue); border-left:1px solid var(--linea); padding-left:14px;
+}
+
+main{flex:1}
+
+footer{
+  border-top:1px solid var(--linea); background:var(--gris);
+  padding:20px; font-size:13px; color:var(--slate);
+}
+footer b{color:var(--navy); font-weight:600}
+footer .legal{margin:10px 0 0; font-size:12px; color:var(--tenue)}
+
+/* ── Veredicto: lo único que importa en el primer segundo ───────────── */
+.veredicto{padding:40px 20px 34px; text-align:center; border-bottom:3px solid}
+.veredicto .icono{
+  width:82px; height:82px; border-radius:50%; margin:0 auto 16px;
+  display:grid; place-items:center; color:#fff;
+  font-size:42px; line-height:1; font-weight:400;
+}
+.veredicto .titulo{
+  font-size:clamp(32px,10.5vw,52px); font-weight:700; margin:0;
+  letter-spacing:.02em; line-height:1.05; text-transform:uppercase;
+}
+.veredicto .lema{
+  margin:10px 0 0; font-size:clamp(14px,4.2vw,18px); font-weight:500;
+  max-width:26em; margin-inline:auto;
+}
+
+.v-ok{background:var(--ok-fondo); border-color:var(--ok)}
+.v-ok .titulo,.v-ok .lema{color:var(--ok)}   .v-ok .icono{background:var(--ok)}
+.v-no{background:var(--no-fondo); border-color:var(--no)}
+.v-no .titulo,.v-no .lema{color:var(--no)}   .v-no .icono{background:var(--no)}
+.v-nd{background:var(--nd-fondo); border-color:var(--nd)}
+.v-nd .titulo,.v-nd .lema{color:var(--nd)}   .v-nd .icono{background:var(--nd)}
+
+/* ── Identidad del documento ────────────────────────────────────────── */
+.doc{padding:28px 20px 8px; max-width:680px; margin:0 auto}
+.doc .obra{
+  font-size:11px; font-weight:600; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--azul); margin:0 0 10px;
+}
+.doc .denom{
+  font-size:clamp(19px,5.2vw,25px); font-weight:600; margin:0 0 4px;
+  text-transform:uppercase; letter-spacing:.01em; line-height:1.25;
+  color:var(--navy);
+}
+.doc .tit{
+  font-size:clamp(15px,4.2vw,18px); font-weight:400; color:var(--slate);
+  margin:0 0 22px;
+}
+
+.datos{width:100%; border-collapse:collapse; font-size:15px}
+.datos th,.datos td{
+  text-align:left; padding:12px 2px; border-bottom:1px solid var(--linea);
+  vertical-align:top;
+}
+.datos th{color:var(--tenue); font-weight:400; width:47%}
+.datos th small{font-size:12px}
+.datos td{font-weight:600; font-variant-numeric:tabular-nums; color:var(--navy)}
+.datos td.suave{font-weight:400; color:var(--slate)}
+.codigo{
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+  letter-spacing:.06em; font-size:14px;
+}
+
+/* ── Aviso de revisión vigente cuando el papel está superado ────────── */
+.aviso{
+  margin:22px auto; padding:18px 20px; max-width:680px;
+  background:var(--no-fondo); border:1px solid var(--no); border-left-width:5px;
+}
+.aviso h2{
+  margin:0 0 10px; font-size:11px; font-weight:600; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--no);
+}
+.aviso p{margin:5px 0}
+.aviso .grande{font-size:30px; font-weight:700; color:var(--no); line-height:1}
+.aviso .accion{margin-top:12px; color:var(--navy)}
+
+.nota{
+  margin:22px auto; padding:16px 18px; max-width:680px; font-size:14px;
+  background:var(--gris); border-left:5px solid var(--azul); color:var(--slate);
+}
+.nota b{color:var(--navy); font-weight:600}
+.nota.alerta{background:#FFF7E6; border-left-color:#FFC000; color:#5C4300}
+.nota.alerta b{color:#5C4300}
+
+/* ── Listado (cuando se entra sin escanear un QR) ───────────────────── */
+.listado{padding:34px 20px; max-width:960px; margin:0 auto}
+.listado h1{
+  font-size:clamp(22px,5vw,28px); font-weight:600; margin:0 0 8px;
+  color:var(--navy); letter-spacing:-.01em;
+}
+.listado .intro{color:var(--slate); margin:0 0 34px; font-size:15px; max-width:56em}
+.obra-bloque{margin-bottom:44px}
+.obra-bloque h2{
+  font-size:13px; font-weight:600; letter-spacing:.16em; text-transform:uppercase;
+  margin:0; color:var(--azul); padding-bottom:10px;
+  border-bottom:1px solid var(--linea);
+}
+.obra-bloque .desc{font-size:13px; color:var(--tenue); margin:12px 0 18px; max-width:60em}
+.tabla-wrap{overflow-x:auto}
+table.planos{width:100%; border-collapse:collapse; font-size:14px; min-width:560px}
+table.planos th,table.planos td{
+  padding:13px 10px 13px 0; text-align:left; border-bottom:1px solid var(--linea);
+}
+table.planos thead th{
+  font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.14em;
+  color:var(--tenue); border-bottom:1px solid var(--slate); padding-bottom:9px;
+}
+table.planos td.num{font-variant-numeric:tabular-nums; white-space:nowrap}
+table.planos td.denom{font-weight:600; color:var(--navy); text-transform:uppercase;
+  font-size:13px; letter-spacing:.02em}
+table.planos td.tit{color:var(--slate)}
+.pill{
+  display:inline-block; padding:4px 11px; font-size:12px; font-weight:600;
+  color:#fff; background:var(--ok); white-space:nowrap; letter-spacing:.04em;
+}
+.centrado{padding:64px 24px; text-align:center; color:var(--tenue)}
+</style>
+</head>
+<body>
+
+<header>
+  <img class="logo" src="logo-ines.svg" alt="INES Ingenieros Consultores">
+  <span class="rotulo">Control de planos de obra</span>
+</header>
+
+<main id="app">
+  <div class="centrado">Cargando…</div>
+</main>
+
+<footer>
+  <div id="pie-estado"></div>
+  <p class="legal">
+    Esta página indica únicamente si un plano impreso es la revisión vigente.
+    No contiene planos ni información técnica.
+  </p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var CACHE = "control_planos_v1";
+  var app   = document.getElementById("app");
+  var pie   = document.getElementById("pie-estado");
+
+  /* ─── Utilidades ─────────────────────────────────────────────── */
+  function esc(s){
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+  function fecha(iso){
+    if(!iso) return "—";
+    var p = String(iso).slice(0,10).split("-");
+    return p.length === 3 ? p[2]+"/"+p[1]+"/"+p[0] : iso;
+  }
+  function fechaHora(iso){
+    var d = new Date(iso);
+    if(isNaN(d)) return esc(iso);
+    var dd = function(n){ return (n<10?"0":"")+n; };
+    return dd(d.getDate())+"/"+dd(d.getMonth()+1)+"/"+d.getFullYear()+
+           " a las "+dd(d.getHours())+":"+dd(d.getMinutes());
+  }
+
+  /* ─── Carga del registro, con respaldo sin cobertura ─────────── */
+  function cargar(){
+    var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+    var reloj = ctrl ? setTimeout(function(){ ctrl.abort(); }, 7000) : null;
+    var opts  = { cache:"no-cache" };
+    if(ctrl) opts.signal = ctrl.signal;
+
+    return fetch("planos.json", opts).then(function(r){
+      if(reloj) clearTimeout(reloj);
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      return r.json();
+    }).then(function(d){
+      try{
+        localStorage.setItem(CACHE, JSON.stringify({ d:d, ts:Date.now() }));
+      }catch(e){ /* modo privado o almacenamiento bloqueado: da igual */ }
+      return { datos:d, offline:false };
+    }).catch(function(){
+      try{
+        var c = JSON.parse(localStorage.getItem(CACHE));
+        if(c && c.d) return { datos:c.d, offline:true, ts:c.ts };
+      }catch(e){}
+      return null;
+    });
+  }
+
+  /* ─── Interpretación del código del QR ───────────────────────── */
+  function partir(codigo){
+    var m = /^\s*([A-Za-z0-9]+)-(\d+)-R(\d+)\s*$/.exec(codigo || "");
+    if(!m) return null;
+    return { obra:m[1].toUpperCase(), id:m[1].toUpperCase()+"-"+m[2], rev:m[3] };
+  }
+
+  function buscar(datos, ref){
+    var obra = datos.obras && datos.obras[ref.obra];
+    if(!obra) return null;
+    var docs = obra.documentos || [];
+    for(var i=0;i<docs.length;i++){
+      if(docs[i].id === ref.id) return { obra:obra, doc:docs[i] };
+    }
+    return null;
+  }
+
+  /* ─── Pantalla de veredicto ──────────────────────────────────── */
+  function pintarVeredicto(codigo, datos){
+    var ref = partir(codigo);
+    var hit = ref ? buscar(datos, ref) : null;
+
+    if(!hit){
+      app.innerHTML =
+        '<div class="veredicto v-nd">'+
+          '<div class="icono">?</div>'+
+          '<h1 class="titulo">Código no válido</h1>'+
+          '<p class="lema">No corresponde a ningún plano registrado</p>'+
+        '</div>'+
+        '<div class="doc"><table class="datos"><tr><th>Código leído</th>'+
+        '<td class="codigo">'+esc(codigo)+'</td></tr></table></div>'+
+        '<div class="nota"><b>Qué hacer.</b> Puede tratarse de un plano anterior '+
+        'a la puesta en marcha del sistema, de un QR dañado o de otra obra. '+
+        'Llama a la oficina técnica y dicta el código que está impreso en letra '+
+        'normal debajo del QR.</div>';
+      return;
+    }
+
+    var doc = hit.doc, obra = hit.obra;
+    var esta = null, vig = null;
+    (doc.revisiones || []).forEach(function(r){
+      if(r.rev === ref.rev)      esta = r;
+      if(r.rev === doc.vigente)  vig  = r;
+    });
+
+    if(!esta){   // documento conocido, revisión desconocida
+      app.innerHTML =
+        '<div class="veredicto v-nd">'+
+          '<div class="icono">?</div>'+
+          '<h1 class="titulo">Revisión desconocida</h1>'+
+          '<p class="lema">Ese documento existe, pero esa revisión no está registrada</p>'+
+        '</div>'+
+        '<div class="doc">'+
+          '<p class="obra">'+esc(obra.nombre)+'</p>'+
+          '<h1 class="denom">'+esc(doc.denominacion)+'</h1>'+
+          '<p class="tit">'+esc(doc.titulo || "")+'</p>'+
+          '<table class="datos">'+
+            '<tr><th>Revisión leída</th><td>R'+esc(ref.rev)+'</td></tr>'+
+            '<tr><th>Revisión vigente</th><td>R'+esc(doc.vigente)+'</td></tr>'+
+            '<tr><th>Código</th><td class="codigo">'+esc(codigo)+'</td></tr>'+
+          '</table>'+
+        '</div>'+
+        '<div class="nota"><b>Qué hacer.</b> No uses ese papel y avisa a la '+
+        'oficina técnica.</div>';
+      return;
+    }
+
+    var vigente = (ref.rev === doc.vigente);
+    var h = "";
+
+    h += '<div class="veredicto '+(vigente?"v-ok":"v-no")+'">'+
+           '<div class="icono">'+(vigente?"&#10003;":"&#10007;")+'</div>'+
+           '<h1 class="titulo">'+(vigente?"Vigente":"Superado")+'</h1>'+
+           '<p class="lema">'+(vigente
+              ? "Este plano es la última revisión"
+              : "No utilizar: existe una revisión posterior")+'</p>'+
+         '</div>';
+
+    if(!vigente && vig){
+      h += '<div class="aviso">'+
+             '<h2>Revisión vigente</h2>'+
+             '<p class="grande">R'+esc(vig.rev)+'</p>'+
+             '<p>Emitida el '+fecha(vig.fecha)+
+               (vig.n_indice ? ' · Nº de índice '+esc(vig.n_indice) : '')+
+               (vig.hojas ? ' · '+esc(vig.hojas)+' hojas' : '')+'</p>'+
+             (vig.motivo ? '<p><b>Motivo del cambio:</b> '+esc(vig.motivo)+'</p>' : '')+
+             '<p class="accion">Pide esta revisión a la dirección de obra o a la '+
+             'oficina técnica, y retira el papel antiguo.</p>'+
+           '</div>';
+    }
+
+    h += '<div class="doc">'+
+           '<p class="obra">'+esc(obra.nombre)+'</p>'+
+           '<h1 class="denom">'+esc(doc.denominacion)+'</h1>'+
+           '<p class="tit">'+esc(doc.titulo || "")+'</p>'+
+           '<table class="datos">'+
+             '<tr><th>Revisión de este papel</th><td>R'+esc(esta.rev)+'</td></tr>'+
+             '<tr><th>Fecha de emisión</th><td>'+fecha(esta.fecha)+'</td></tr>'+
+             '<tr><th>Nº de índice <small>(según el cajetín de este papel)</small></th>'+
+               '<td>'+esc(esta.n_indice || "—")+'</td></tr>'+
+             '<tr><th>Hojas del documento</th><td>'+esc(esta.hojas || "—")+'</td></tr>'+
+             (esta.motivo ? '<tr><th>Motivo de esta revisión</th>'+
+               '<td class="suave">'+esc(esta.motivo)+'</td></tr>' : '')+
+             '<tr><th>Expediente</th><td class="suave">'+
+               esc(obra.expediente || "—")+'</td></tr>'+
+             '<tr><th>Código</th><td class="codigo">'+esc(codigo)+'</td></tr>'+
+           '</table>'+
+         '</div>';
+
+    app.innerHTML = h;
+  }
+
+  /* ─── Pantalla de listado ────────────────────────────────────── */
+  function pintarListado(datos){
+    var obras = datos.obras || {};
+    var h = '<div class="listado">'+
+              '<h1>Planos vigentes</h1>'+
+              '<p class="intro">Listado de la revisión vigente de cada documento. '+
+              'Para comprobar si un plano impreso está al día, escanea el código QR '+
+              'que lleva junto al cajetín.</p>';
+
+    var claves = Object.keys(obras);
+    if(!claves.length) h += '<p>No hay obras registradas.</p>';
+
+    claves.forEach(function(k){
+      var o = obras[k];
+      function ni(d){
+        var r = (d.revisiones||[]).filter(function(x){ return x.rev === d.vigente; })[0];
+        return parseInt((r && r.n_indice) || "999", 10);
+      }
+      var docs = (o.documentos || []).slice().sort(function(a,b){ return ni(a)-ni(b); });
+
+      h += '<div class="obra-bloque">'+
+             '<h2>'+esc(o.nombre)+'</h2>'+
+             (o.descripcion ? '<p class="desc">'+esc(o.descripcion)+'</p>' : '')+
+             '<div class="tabla-wrap"><table class="planos"><thead><tr>'+
+               '<th>Nº</th><th>Denominación</th><th>Título</th>'+
+               '<th>Revisión</th><th>Emitida</th><th>Hojas</th>'+
+             '</tr></thead><tbody>';
+
+      docs.forEach(function(d){
+        var v = (d.revisiones||[]).filter(function(x){ return x.rev === d.vigente; })[0] || {};
+        h += '<tr>'+
+               '<td class="num">'+esc(v.n_indice || "—")+'</td>'+
+               '<td class="denom">'+esc(d.denominacion)+'</td>'+
+               '<td class="tit">'+esc(d.titulo || "")+'</td>'+
+               '<td class="num"><span class="pill">R'+esc(d.vigente)+'</span></td>'+
+               '<td class="num">'+fecha(v.fecha)+'</td>'+
+               '<td class="num">'+esc(v.hojas || "—")+'</td>'+
+             '</tr>';
+      });
+
+      h += '</tbody></table></div></div>';
+    });
+
+    app.innerHTML = h + '</div>';
+  }
+
+  /* ─── Arranque ───────────────────────────────────────────────── */
+  // Se acepta ?p= y ?P=: la dirección de los QR va en mayúsculas para que
+  // el símbolo salga menos denso y se lea mejor en papel (D-15).
+  var _q = new URLSearchParams(location.search);
+  var codigo = _q.get("p") || _q.get("P");
+
+  cargar().then(function(res){
+    if(!res){
+      app.innerHTML =
+        '<div class="veredicto v-nd">'+
+          '<div class="icono">!</div>'+
+          '<h1 class="titulo">Sin conexión</h1>'+
+          '<p class="lema">No se ha podido consultar el listado</p>'+
+        '</div>'+
+        '<div class="nota"><b>Qué hacer.</b> Sal a una zona con cobertura y vuelve '+
+        'a escanear el QR. Si no es posible, llama a la oficina técnica y dicta el '+
+        'código impreso debajo del QR.</div>';
+      pie.innerHTML = "No se ha podido cargar el listado.";
+      return;
+    }
+
+    if(codigo) pintarVeredicto(codigo, res.datos);
+    else       pintarListado(res.datos);
+
+    pie.innerHTML = res.offline
+      ? '<b>Atención:</b> sin conexión. Se está usando la copia guardada en este '+
+        'móvil el '+fechaHora(res.ts)+'. Si el plano se ha revisado después, esta '+
+        'respuesta puede no ser correcta.'
+      : 'Listado actualizado el <b>'+fechaHora(res.datos.actualizado)+'</b>.';
+
+    if(res.offline){
+      var n = document.createElement("div");
+      n.className = "nota alerta";
+      n.innerHTML = '<b>Sin cobertura.</b> Esta respuesta viene de la copia '+
+                    'guardada en el móvil el '+fechaHora(res.ts)+', no del '+
+                    'servidor. Confírmala cuando tengas conexión.';
+      app.appendChild(n);
+    }
+  });
+})();
+</script>
+</body>
+</html>

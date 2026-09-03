@@ -1,0 +1,23 @@
+# Entorno virtual
+.venv/
+__pycache__/
+*.pyc
+
+# Secretos
+.env
+
+# ATENCION: documentacion de cliente. Nunca debe subirse al repositorio,
+# porque este repositorio va a ser PUBLICO (ver docs/DECISIONES.md, D-11).
+muestras/
+salida/
+*.dwg
+
+# Herramientas
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+
+# Copias de seguridad del registro
+*.json.bak
+*.json.tmp

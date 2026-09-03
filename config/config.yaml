@@ -1,0 +1,53 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Configuración de la herramienta de emisión de planos
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Dirección base de la web de verificación, SIN la barra final.
+#
+#   MIENTRAS ESTÉ VACÍA, LA HERRAMIENTA TRABAJA EN MODO PRUEBA:
+#   estampa la palabra PRUEBA junto al código, bien visible, para que un plano
+#   de ensayo no pueda confundirse nunca con uno emitido de verdad.
+#
+# Cuando exista la cuenta de organización de INES en GitHub, poner aquí la
+# dirección definitiva. Por ejemplo:
+#   url_base: "https://inesingenieros.github.io/control-planos"
+url_base: ""
+
+# ── Estampado del QR ──────────────────────────────────────────────────────
+# Medidas en milímetros, referidas al borde de la hoja.
+# Los valores por defecto se midieron sobre un plano real de la obra de Seseña
+# (A3 apaisado): la banda libre encima del cajetín va de 330 a 412 mm desde el
+# borde izquierdo y de 25 a 55 mm desde el borde inferior. Eso da 30 mm de
+# alto útil, de los que el QR usa 24: por debajo de eso los módulos salen
+# demasiado finos para leerse en papel. Ver docs/DECISIONES.md, D-15.
+estampado:
+  lado_qr_mm: 20.0          # lado del cuadrado del QR
+  margen_derecho_mm: 24.0   # del borde derecho de la hoja al borde del QR
+  margen_inferior_mm: 23.0  # del borde inferior de la hoja al borde del QR
+  hueco_texto_mm: 2.5       # separación entre el texto y el QR
+  texto_pt: 7.0             # cuerpo del código legible
+  recuadro: true            # dibuja un marco blanco bajo el QR, para que se
+                            # lea aunque caiga sobre una zona dibujada
+
+  # Umbral de calidad. Si el lado de cada módulo del QR baja de este valor,
+  # la herramienta avisa: por debajo de ~0,6 mm los móviles empiezan a fallar
+  # al leer sobre papel impreso, fotocopiado o doblado.
+  modulo_minimo_mm: 0.60
+
+# ── Corrección de errores del QR ──────────────────────────────────────────
+# L=7%  M=15%  Q=25%  H=30% de la superficie recuperable si se daña.
+# Q es el adecuado en obra: el papel se moja, se dobla y se mancha.
+# Subirlo hace el QR más denso; bajarlo, más frágil.
+correccion_errores: Q
+
+# ── Numeración ────────────────────────────────────────────────────────────
+# La serie de correlativos arranca en 101 para que un correlativo no se pueda
+# confundir con el «Nº» del cajetín, que es de una o dos cifras.
+# Ver docs/DECISIONES.md, D-08.
+correlativo_inicial: 101
+
+# ── Rutas ─────────────────────────────────────────────────────────────────
+# Relativas a la raíz del proyecto.
+rutas:
+  registro: "web/planos.json"
+  salida: "salida"

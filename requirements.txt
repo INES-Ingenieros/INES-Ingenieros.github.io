@@ -1,0 +1,16 @@
+# Control de planos con QR — dependencias
+# Python 3.11 o superior (desarrollado con 3.13)
+#
+# Todas con licencia permisiva (BSD/MIT). Se ha evitado deliberadamente
+# PyMuPDF, que es mas comoda para esto pero tiene licencia AGPL.
+# Ver docs/DECISIONES.md, D-14.
+
+pypdf==6.16.2          # leer y escribir PDF                        (BSD)
+reportlab==4.4.4       # generar la capa que se superpone al PDF     (BSD)
+qrcode==8.2            # generar el codigo QR                       (BSD)
+pillow==12.2.0         # imagenes, requerido por qrcode              (MIT-CMU)
+PyYAML==6.0.3          # leer la configuracion                      (MIT)
+
+# Solo para desarrollo y analisis de PDF de muestra
+pdfplumber==0.11.10    # inspeccion de PDF                          (MIT)
+pytest==8.4.2          # tests
