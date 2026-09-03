@@ -90,11 +90,13 @@ def cargar(ruta: str | Path | None = None) -> Config:
 
     col = Colocacion(
         lado_qr_mm=float(est.get("lado_qr_mm", 18.0)),
-        margen_derecho_mm=float(est.get("margen_derecho_mm", 12.0)),
-        margen_inferior_mm=float(est.get("margen_inferior_mm", 26.0)),
+        margen_derecho_mm=float(est.get("margen_derecho_mm", 22.7)),
+        margen_inferior_mm=float(est.get("margen_inferior_mm", 22.8)),
         hueco_texto_mm=float(est.get("hueco_texto_mm", 2.5)),
         texto_pt=float(est.get("texto_pt", 7.0)),
         recuadro=bool(est.get("recuadro", True)),
+        holgura_mm=float(est.get("holgura_mm", 0.4)),
+        texto_visible=bool(est.get("texto_visible", False)),
     )
     if col.lado_qr_mm <= 0:
         raise ErrorConfig("«lado_qr_mm» tiene que ser mayor que cero")

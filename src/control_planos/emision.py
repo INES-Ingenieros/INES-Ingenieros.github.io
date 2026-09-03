@@ -126,6 +126,10 @@ def emitir(peticion: Peticion, cfg: Config) -> Emision:
         n_indice=peticion.n_indice,
         hojas=hojas,
         motivo=peticion.motivo,
+        # En modo prueba el registro no se guarda, asi que no hay razon para
+        # impedir re-sellar una revision ya emitida: es justo lo que hace falta
+        # para reimprimir una hoja de ensayo.
+        permitir_repetida=cfg.modo_prueba,
     )
 
     # 4 y 5 · Dirección y QR.

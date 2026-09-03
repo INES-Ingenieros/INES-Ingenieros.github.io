@@ -163,6 +163,7 @@ class Registro:
         titulo: str = "",
         motivo: str = "",
         correlativo: int | None = None,
+        permitir_repetida: bool = False,
     ) -> Codigo:
         """Da de alta una revisión y la deja como la vigente.
 
@@ -172,6 +173,12 @@ class Registro:
 
         Returns:
             El `Codigo` de la revisión registrada, listo para el QR.
+
+        Args:
+            permitir_repetida: deja pasar una revisión que ya existe, sin
+                tocarla. Solo se usa en modo prueba, donde el registro no se
+                guarda: hace falta para poder volver a sellar una hoja de
+                ensayo de una revisión ya emitida.
 
         Raises:
             ErrorRegistro: si esa revisión ya estaba registrada. No se
@@ -204,7 +211,9 @@ class Registro:
             if titulo:
                 doc["titulo"] = titulo
 
-        if any(r.get("rev") == codigo.revision for r in doc["revisiones"]):
+        if not permitir_repetida and any(
+            r.get("rev") == codigo.revision for r in doc["revisiones"]
+        ):
             raise ErrorRegistro(
                 f"la revisión R{codigo.revision} de {codigo.documento} ya está "
                 "registrada. Si de verdad hay que rehacerla, hay que retirarla "

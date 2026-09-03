@@ -69,11 +69,20 @@ class TestEstampado:
         emitir(_peticion(origen), cfg)
         assert origen.read_bytes() == antes
 
-    def test_el_codigo_legible_queda_en_el_pdf(self, pdf_a3, cfg):
-        """Es la vía de contraste cuando el QR no se puede escanear (D-07)."""
+    def test_por_defecto_solo_se_estampa_el_qr(self, pdf_a3, cfg):
+        """Con el texto al lado, el sello pasa de un cuadrado de 20 mm a una
+        tira de 42 mm que invade el cajetín y el dibujo. Ver D-17."""
         em = emitir(_peticion(pdf_a3(hojas=1)), cfg)
-        texto = PdfReader(em.pdf).pages[0].extract_text() or ""
-        assert "SESENA-101-R00" in texto.replace("\n", "")
+        texto = (PdfReader(em.pdf).pages[0].extract_text() or "").replace("\n", "")
+        assert "SESENA-101-R00" not in texto
+
+    def test_el_codigo_legible_se_puede_activar(self, pdf_a3, cfg):
+        """Sigue disponible para quien quiera la vía de dictado (D-07)."""
+        con_texto = dataclasses.replace(cfg.colocacion, texto_visible=True)
+        cfg = dataclasses.replace(cfg, colocacion=con_texto)
+        em = emitir(_peticion(pdf_a3(hojas=1)), cfg)
+        texto = (PdfReader(em.pdf).pages[0].extract_text() or "").replace("\n", "")
+        assert "SESENA-101-R00" in texto
 
     def test_conserva_el_contenido_original(self, pdf_a3, cfg):
         em = emitir(_peticion(pdf_a3(hojas=1)), cfg)

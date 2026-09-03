@@ -24,12 +24,31 @@ url_base: "HTTPS://INES-INGENIEROS.GITHUB.IO"
 # demasiado finos para leerse en papel. Ver docs/DECISIONES.md, D-15.
 estampado:
   lado_qr_mm: 20.0          # lado del cuadrado del QR
-  margen_derecho_mm: 24.0   # del borde derecho de la hoja al borde del QR
-  margen_inferior_mm: 23.0  # del borde inferior de la hoja al borde del QR
-  hueco_texto_mm: 2.5       # separación entre el texto y el QR
-  texto_pt: 7.0             # cuerpo del código legible
-  recuadro: true            # dibuja un marco blanco bajo el QR, para que se
-                            # lea aunque caiga sobre una zona dibujada
+
+  # Posicion del QR, medida desde el borde de la hoja.
+  # Cotas reales del cajetin de la Comunidad de Madrid en A3 apaisado:
+  #   borde derecho del marco ....... 399,76 mm
+  #   techo del cajetin .............  21,71 mm
+  #   borde inferior de la ortofoto ..  43,85 mm
+  # Queda una banda limpia de 22,1 mm de alto. El sello (QR de 20 mm mas
+  # 0,4 mm de margen blanco = 20,8 mm) se centra en ella, con unos 0,6 mm
+  # de holgura arriba y abajo, y a 1,9 mm del marco por la derecha.
+  # Asi no toca ni el cajetin ni el dibujo.
+  margen_derecho_mm: 22.7
+  margen_inferior_mm: 22.8
+
+  # Solo el QR, sin el codigo en texto al lado. Con el texto, el sello pasa
+  # de un cuadrado de 20 mm a una tira de 42 mm que invade el cajetin.
+  # Contrapartida: se pierde poder dictar el codigo por telefono cuando el QR
+  # no se puede escanear. Ver docs/DECISIONES.md, D-17.
+  texto_visible: false
+  texto_pt: 7.0             # cuerpo del codigo, si se activa texto_visible
+  hueco_texto_mm: 2.5       # separacion entre el texto y el QR
+
+  recuadro: true            # marco blanco bajo el sello, para que se lea
+                            # aunque caiga sobre una zona dibujada
+  holgura_mm: 0.4           # ancho de ese marco blanco. Cada decima se come
+                            # la holgura de la banda libre sobre el cajetin
 
   # Umbral de calidad. Si el lado de cada módulo del QR baja de este valor,
   # la herramienta avisa: por debajo de ~0,6 mm los móviles empiezan a fallar

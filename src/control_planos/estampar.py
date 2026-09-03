@@ -43,11 +43,30 @@ class Colocacion:
     """Dónde y cómo se estampa. En milímetros, desde el borde de la hoja."""
 
     lado_qr_mm: float = 20.0
-    margen_derecho_mm: float = 24.0
-    margen_inferior_mm: float = 23.0
+    margen_derecho_mm: float = 22.7
+    margen_inferior_mm: float = 22.8
     hueco_texto_mm: float = 2.5
     texto_pt: float = 7.0
     recuadro: bool = True
+    holgura_mm: float = 0.4
+    """Margen blanco alrededor del sello, fuera del QR.
+
+    Se mantiene pequeno a proposito: el QR ya lleva dentro su propia zona de
+    silencio de dos modulos, asi que este margen solo sirve para separar el
+    sello del dibujo. Cada decima de mas se come la holgura de la banda libre
+    sobre el cajetin, que solo tiene 22 mm.
+    """
+
+    texto_visible: bool = False
+    """Imprimir el codigo en texto legible junto al QR.
+
+    Desactivado por defecto: con el texto, el sello pasa de un cuadrado de
+    20 mm a una tira de 42 mm que invade el cajetin y el dibujo.
+
+    Contrapartida que hay que conocer: sin texto se pierde la via de contraste
+    cuando el QR no se puede escanear (papel roto, mojado, mal fotocopiado, o
+    sin cobertura). Ver docs/DECISIONES.md, D-07 y D-17.
+    """
 
 
 @dataclass
@@ -102,16 +121,21 @@ def _capa(
     x_qr = ancho - col.margen_derecho_mm * mm - lado
     y_qr = col.margen_inferior_mm * mm
 
-    lineas = [codigo] if not modo_prueba else ["PRUEBA — NO VÁLIDO", codigo]
+    # El aviso de PRUEBA se imprime siempre, aunque el texto este desactivado:
+    # un plano de ensayo no puede confundirse nunca con uno valido.
+    if modo_prueba:
+        lineas = ["PRUEBA — NO VÁLIDO"] + ([codigo] if col.texto_visible else [])
+    else:
+        lineas = [codigo] if col.texto_visible else []
     anchos = [stringWidth(t, FUENTE, col.texto_pt) for t in lineas]
     ancho_texto = max(anchos) if anchos else 0.0
-    x_texto_der = x_qr - col.hueco_texto_mm * mm
+    x_texto_der = x_qr - (col.hueco_texto_mm * mm if lineas else 0.0)
 
     if col.recuadro:
         # Fondo blanco bajo el sello, para que se lea aunque caiga sobre una
         # zona dibujada del plano. Con un hilo fino gris para que se distinga
         # del papel y no parezca un hueco del dibujo.
-        holgura = 1.0 * mm
+        holgura = col.holgura_mm * mm
         x0 = x_texto_der - ancho_texto - holgura
         c.setFillColorRGB(1, 1, 1)
         c.setStrokeColorRGB(0.72, 0.72, 0.72)

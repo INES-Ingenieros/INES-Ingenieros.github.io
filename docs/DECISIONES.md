@@ -32,6 +32,7 @@ la documentación.
 | D-14 | Solo librerías con licencia permisiva | Cerrada |
 | D-15 | El QR mide 20 mm y va en la banda sobre el cajetín | Cerrada · ensayo en papel superado |
 | D-16 | Accesos directos, no ficheros `.bat` | Cerrada |
+| D-17 | Se estampa solo el QR, sin el código en texto | Cerrada |
 
 ---
 
@@ -531,6 +532,52 @@ que con un `.bat`.
 
 **Lección que conviene recordar.** El entorno de destino no se supone: se prueba. Este
 fallo no lo habría detectado ningún test, porque no está en el código.
+
+---
+
+## D-17 · Se estampa solo el QR, sin el código en texto
+
+**Decisión.** El sello es un cuadrado de 20 mm con el QR y nada más. El código en texto
+legible al lado queda desactivado, aunque sigue disponible en la configuración
+(`texto_visible`).
+
+**Por qué.** Con el texto, el sello dejaba de ser un cuadrado de 20 mm y pasaba a ser
+una **tira de 42 mm de ancho** que ocupaba los 22 mm de banda libre enteros, sin margen.
+En la práctica invadía por abajo la línea del cajetín y por arriba el borde del dibujo.
+
+Cotas medidas sobre el cajetín real (A3 apaisado, Comunidad de Madrid):
+
+| Referencia | Cota |
+|---|---|
+| Borde derecho del marco | 399,76 mm |
+| Techo del cajetín | 21,71 mm |
+| Borde inferior de la ortofoto | 43,85 mm |
+| Banda limpia | 22,14 mm de alto |
+| Sello: QR 20 mm + 0,4 mm de margen blanco | 20,8 mm |
+| Holgura resultante | ~0,6 mm arriba y abajo, 1,9 mm hasta el marco |
+
+También se redujo el margen blanco del recuadro de 1 mm a 0,4 mm. El QR ya lleva dentro
+su propia zona de silencio de dos módulos, así que ese margen solo separa el sello del
+dibujo, y cada décima se come la holgura de una banda que solo tiene 22 mm.
+
+**Lo que se pierde, y hay que saberlo.** El código en texto no era decorativo: era la
+vía de contraste cuando el QR no se puede escanear —papel roto, mojado, mal
+fotocopiado— o cuando no hay cobertura y hay que dictarlo por teléfono. Ese camino,
+que era uno de los motivos para elegir un código legible en vez de un GUID (D-07),
+**deja de estar disponible en el papel**.
+
+Sigue existiendo la vía indirecta: el `Nº` y el `HOJA n DE m` del cajetín identifican el
+documento, y con eso la oficina puede localizarlo en el registro. Es más lento, pero no
+queda nadie sin respuesta.
+
+**Cómo recuperarlo si algún día hace falta.** Poner `texto_visible: true` en
+`config/config.yaml`. Habría que reducir el QR o buscarle otro sitio, porque los 42 mm
+no caben en la banda sin invadir algo.
+
+**Un arreglo que salió de paso.** En modo prueba ya se puede volver a sellar una revisión
+ya emitida. Antes lo impedía la comprobación de revisión repetida, que no tenía sentido
+ahí: en modo prueba el registro no se guarda, y volver a sellar es justo lo que hace
+falta para reimprimir una hoja de ensayo.
 
 ---
 
