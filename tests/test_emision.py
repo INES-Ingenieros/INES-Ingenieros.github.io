@@ -188,3 +188,22 @@ class TestModoPrueba:
         assert not cfg.ruta_registro.exists()         # pero el registro intacto
         texto = (PdfReader(em.pdf).pages[0].extract_text() or "").replace("\n", "")
         assert "PRUEBA" in texto                      # y el papel marcado
+
+
+class TestDatosDeLaObra:
+    """Una obra nueva no puede quedar registrada sin nombre: en la web pública
+    aparecería su código interno («SESENA») y el encargado no la reconocería."""
+
+    def test_el_nombre_de_la_obra_llega_al_registro(self, pdf_a3, cfg):
+        emitir(_peticion(pdf_a3(hojas=1)), cfg)
+        reg = Registro.cargar(cfg.ruta_registro)
+        assert reg.obras["SESENA"]["nombre"] == "Emergencia Seseña"
+
+    def test_sin_nombre_se_registra_el_codigo_y_hay_que_evitarlo(self, pdf_a3, cfg):
+        """Comportamiento del motor cuando no se le dan datos de obra.
+        La interfaz debe impedir llegar aquí; ver `_datos_obra` en cli.py."""
+        p = _peticion(pdf_a3(hojas=1))
+        p.nombre_obra = ""
+        emitir(p, cfg)
+        reg = Registro.cargar(cfg.ruta_registro)
+        assert reg.obras["SESENA"]["nombre"] == "SESENA"

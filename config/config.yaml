@@ -10,8 +10,10 @@
 #
 # Cuando exista la cuenta de organización de INES en GitHub, poner aquí la
 # dirección definitiva. Por ejemplo:
-#   url_base: "https://inesingenieros.github.io/control-planos"
-url_base: ""
+# Va en MAYUSCULAS a proposito: el formato QR comprime mejor las mayusculas
+# y el simbolo sale menos denso, lo que importa a 20 mm sobre papel de obra.
+# La web acepta tanto ?p= como ?P=. Ver docs/DECISIONES.md, D-15.
+url_base: "HTTPS://INES-INGENIEROS.GITHUB.IO"
 
 # ── Estampado del QR ──────────────────────────────────────────────────────
 # Medidas en milímetros, referidas al borde de la hoja.

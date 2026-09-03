@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-09-03T11:40:00+02:00",
+  "actualizado": "2026-09-03T15:17:11+02:00",
   "obras": {
     "SESENA": {
       "nombre": "Emergencia Seseña",
@@ -20,37 +20,6 @@
               "estado": "vigente",
               "motivo": "Primera emisión"
             }
-          ]
-        }
-      ]
-    },
-    "DEMO": {
-      "nombre": "Obra de demostración",
-      "descripcion": "Datos ficticios para probar la página. No corresponde a ninguna obra real.",
-      "expediente": "—",
-      "documentos": [
-        {
-          "id": "DEMO-101",
-          "denominacion": "PLANTAS DE ESTRUCTURA",
-          "titulo": "Estribo 1 · armado y despiece",
-          "vigente": "02",
-          "revisiones": [
-            { "rev": "00", "fecha": "2026-06-10", "n_indice": "04", "hojas": 3,
-              "estado": "superado", "motivo": "Primera emisión" },
-            { "rev": "01", "fecha": "2026-07-22", "n_indice": "04", "hojas": 3,
-              "estado": "superado", "motivo": "Corrección del recubrimiento en cara vista" },
-            { "rev": "02", "fecha": "2026-08-30", "n_indice": "02", "hojas": 5,
-              "estado": "vigente", "motivo": "Se añaden dos hojas de despiece y se reordena el índice" }
-          ]
-        },
-        {
-          "id": "DEMO-102",
-          "denominacion": "DESVÍOS PROVISIONALES",
-          "titulo": "Fase 2 · itinerario alternativo",
-          "vigente": "00",
-          "revisiones": [
-            { "rev": "00", "fecha": "2026-08-05", "n_indice": "07", "hojas": 2,
-              "estado": "vigente", "motivo": "Primera emisión" }
           ]
         }
       ]

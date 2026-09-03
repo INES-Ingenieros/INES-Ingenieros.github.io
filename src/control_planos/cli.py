@@ -91,7 +91,48 @@ def _preguntar(
         print("    (hace falta un valor)")
 
 
-def _elegir_obra(registro: Registro) -> tuple[str, dict[str, str]]:
+def _datos_obra(
+    obra: str, registro: Registro, args: argparse.Namespace
+) -> dict[str, str]:
+    """Los datos de la obra, si es nueva y hacen falta.
+
+    Se piden una sola vez, la primera vez que aparece una obra en el registro.
+    Si ya está registrada, devuelve un diccionario vacío y no molesta.
+
+    Los toma de los parámetros si se han dado; si no, pregunta. Nunca los
+    inventa: sin nombre, la obra aparecería en la web pública con su código
+    interno («SESENA») en lugar de su nombre, y el encargado no la reconocería.
+    """
+    if obra in registro.obras:
+        return {}
+
+    extra = {
+        "nombre_obra": args.nombre_obra or "",
+        "expediente": args.expediente or "",
+        "descripcion_obra": args.descripcion or "",
+    }
+    if extra["nombre_obra"]:
+        return extra
+
+    if not sys.stdin.isatty():
+        raise SystemExit(
+            f"\n  «{obra}» es una obra nueva y no se ha indicado su nombre.\n"
+            "  Añade --nombre-obra \"...\" (y si quieres --expediente y\n"
+            "  --descripcion), o ejecútalo sin --obra para que te lo pregunte.\n"
+        )
+
+    print(f"\n  «{obra}» es una obra nueva. Necesito sus datos una sola vez.")
+    extra["nombre_obra"] = _preguntar("Nombre de la obra")
+    if not extra["expediente"]:
+        extra["expediente"] = _preguntar("Expediente", obligatorio=False)
+    if not extra["descripcion_obra"]:
+        extra["descripcion_obra"] = _preguntar(
+            "Descripción (una línea)", obligatorio=False
+        )
+    return extra
+
+
+def _elegir_obra(registro: Registro, args: argparse.Namespace) -> tuple[str, dict[str, str]]:
     """Pregunta la obra, ofreciendo las que ya están registradas."""
     conocidas = sorted(registro.obras)
     if conocidas:
@@ -104,16 +145,7 @@ def _elegir_obra(registro: Registro) -> tuple[str, dict[str, str]]:
         "Código de obra",
         ayuda="Código corto, en mayúsculas y sin eñes ni tildes (p. ej. SESENA).",
     ).upper()
-
-    extra: dict[str, str] = {}
-    if obra not in registro.obras:
-        print(f"\n  «{obra}» es una obra nueva. Necesito sus datos una sola vez.")
-        extra["nombre_obra"] = _preguntar("Nombre de la obra")
-        extra["expediente"] = _preguntar("Expediente", obligatorio=False)
-        extra["descripcion_obra"] = _preguntar(
-            "Descripción (una línea)", obligatorio=False
-        )
-    return obra, extra
+    return obra, _datos_obra(obra, registro, args)
 
 
 def _completar(args: argparse.Namespace, registro: Registro) -> Peticion:
@@ -123,7 +155,11 @@ def _completar(args: argparse.Namespace, registro: Registro) -> Peticion:
     if not pdf.exists():
         raise SystemExit(f"\n  No existe el fichero: {pdf}\n")
 
-    obra, extra = (args.obra.upper(), {}) if args.obra else _elegir_obra(registro)
+    if args.obra:
+        obra = args.obra.upper()
+        extra = _datos_obra(obra, registro, args)
+    else:
+        obra, extra = _elegir_obra(registro, args)
 
     denominacion = args.denominacion
     if not denominacion:
@@ -210,6 +246,12 @@ def construir_parser() -> argparse.ArgumentParser:
     )
     p.add_argument("pdf", nargs="?", help="PDF ploteado. Si falta, se pregunta.")
     p.add_argument("--obra", help="Código corto de obra (p. ej. SESENA)")
+    p.add_argument("--nombre-obra", dest="nombre_obra",
+                   help="Nombre de la obra. Solo se usa la primera vez que "
+                        "aparece; es lo que se ve en la web pública")
+    p.add_argument("--expediente", help="Expediente del cliente. Solo la primera vez")
+    p.add_argument("--descripcion", help="Descripción de la obra, una línea. "
+                                         "Solo la primera vez")
     p.add_argument("--denominacion", help="Denominación del documento")
     p.add_argument("--titulo", help="Título del plano")
     p.add_argument("--rev", help="Número de revisión (0, 1, 2...)")
