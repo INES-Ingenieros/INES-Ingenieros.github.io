@@ -21,7 +21,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.4", "pdfplumber>=0.11"]
+dev = [
+    "pytest>=8.4",
+    "pdfplumber>=0.11",       # inspeccion de PDF de muestra
+    "pypdfium2>=5.13",        # rasterizar para el test de ida y vuelta
+    "opencv-python-headless>=4.10",  # leer el QR de vuelta
+]
 
 [project.scripts]
 control-planos = "control_planos.cli:main"
