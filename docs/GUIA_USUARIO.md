@@ -1,6 +1,6 @@
 # Guía de usuario
 
-Última actualización: 3 de septiembre de 2026
+Última actualización: 3 de septiembre de 2026 · Sistema en funcionamiento
 
 ---
 
@@ -13,10 +13,10 @@ es la última revisión o si ya hay una posterior.
 No hace falta instalar ninguna aplicación. No hace falta usuario ni contraseña. No
 hace falta ser de INES.
 
-> **Aviso sobre el estado del sistema.** El diseño está terminado, pero **la
-> herramienta todavía no está construida**. La Parte 1 de esta guía describe cómo va a
-> funcionar para quien esté en obra. La Parte 2 describe el procedimiento previsto para
-> quien emite los planos, y está aquí para poder revisarlo antes de construirlo.
+**La web de comprobación está publicada en:**
+[https://ines-ingenieros.github.io](https://ines-ingenieros.github.io)
+
+Ahí, sin escanear nada, se ve el listado de todos los planos vigentes.
 
 ---
 
@@ -31,7 +31,7 @@ hace falta ser de INES.
 3. Toca el aviso. Se abre la página con la respuesta.
 
 Debajo del QR está impreso también el código en letra normal, algo así como
-`SESENA-014-R00`. Sirve para cuando el escaneo no funciona (más abajo se explica).
+`SESENA-101-R00`. Sirve para cuando el escaneo no funciona (más abajo se explica).
 
 ## Las tres respuestas posibles
 
@@ -75,7 +75,8 @@ Pasa a menudo, y el sistema está pensado para eso.
 - **Si ya has escaneado algún plano antes en ese mismo móvil**, la página suele
   responder igualmente, porque el móvil se guarda la lista en memoria. Fíjate en la
   fecha de «lista actualizada» que aparece abajo: si es de hace mucho, la respuesta
-  puede estar anticuada.
+  puede estar anticuada. La página te avisa en naranja cuando está usando la copia
+  guardada.
 - **Si no responde nada**, sal a una zona con cobertura y vuelve a escanear. O usa el
   método de abajo.
 
@@ -86,7 +87,7 @@ letra normal** impreso al lado.
 
 Llama a la oficina técnica y dicta el código tal cual:
 
-> «Seseña, cero catorce, erre cero cero»
+> «Seseña, ciento uno, erre cero cero»
 
 Con eso pueden comprobarlo en un segundo. Esta es la razón de que el código sea legible
 y corto en lugar de una ristra de letras y números al azar.
@@ -95,69 +96,103 @@ y corto en lugar de una ristra de letras y números al azar.
 
 # Parte 2 · Eres quien emite los planos
 
-> Este procedimiento está **diseñado pero no construido todavía**. Se describe aquí
-> para poder revisarlo antes de programarlo.
+Todo se hace con **dos ficheros, a doble clic**. No hace falta saber Python ni git.
+Están los dos en la carpeta del proyecto:
+
+```
+C:\Users\pia.INTRANET\projects\00_CONTROL_PLANOS\
+    emitir.bat      <- paso 1: mete el QR en el plano
+    publicar.bat    <- paso 2: sube la revision a la web
+```
 
 ## Lo que no cambia en tu trabajo
 
 - Sigues dibujando y ploteando **igual que ahora**, desde AutoCAD o Civil 3D.
-- **No se toca ningún DWG** por este motivo. Ni el cajetín, ni la referencia externa,
-  ni nada.
-- Los ficheros se siguen llamando **igual que ahora** y ordenados por número de índice
-  (`01_DESVIOS_PROVISIONALES.pdf`).
+- **No se toca ningún DWG** por este motivo. Ni el cajetín, ni la referencia externa.
+- Los ficheros se siguen llamando **igual que ahora**, ordenados por número de índice.
 - Los PDF se siguen guardando en **SharePoint**, en la biblioteca de la obra.
-- Puedes **reordenar el índice de planos** cuando haga falta, sin que eso invalide
-  ningún QR ya impreso. El sistema está diseñado específicamente para aguantar eso.
+- Puedes **reordenar el índice de planos** cuando haga falta, sin invalidar ningún QR
+  ya impreso. El sistema está diseñado específicamente para aguantar eso.
 
-## Lo que cambia: un paso más antes de imprimir
+## Paso 1 · Meter el QR en el plano
 
-El flujo previsto es este:
+1. Abre la carpeta `00_CONTROL_PLANOS` en el explorador de Windows.
+2. **Arrastra el PDF ploteado encima de `emitir.bat`** y suéltalo.
+3. Se abre una ventana negra que te va preguntando, **una cosa a la vez**:
+
+| Te pregunta | Qué contestar |
+|---|---|
+| Código de obra | El código corto, p. ej. `SESENA`. Te enseña las obras que ya existen |
+| Denominación del documento | Lo que pone el cajetín en «DESIGNACIÓN DEL PLANO» |
+| Revisión | Te propone la siguiente. Pulsa Intro para aceptarla |
+| Título del plano | La línea de detalle. Puede quedar vacío |
+| Nº de índice | El «Nº» del cajetín **de este papel** |
+| Motivo del cambio | Solo si no es la primera emisión. **Lo lee el encargado en obra** |
+
+Si la obra es nueva te pedirá además su nombre y su expediente, **una sola vez**.
+
+4. Al terminar te dice el código asignado y dónde ha dejado el PDF sellado:
 
 ```
-1. Ploteas el PDF como siempre
-        ↓
-2. Pasas el PDF por la herramienta, indicando:
-     · de qué obra es
-     · qué documento es (si es nuevo, se le asigna un número)
-     · qué revisión es
-     · el motivo del cambio (si no es la primera emisión)
-        ↓
-3. La herramienta te devuelve el PDF con el QR estampado
-   en todas las hojas, y actualiza el registro público
-        ↓
-4. Ese PDF con QR es el que se guarda en SharePoint y el que se imprime
+C:\Users\pia.INTRANET\projects\00_CONTROL_PLANOS\salida\
 ```
 
-El paso 2 es el único añadido. El resto ya lo haces.
+5. **Ese PDF de `salida` es el que se guarda en SharePoint y el que se imprime.**
+   El original no se toca.
+
+Puedes emitir varios planos seguidos antes de pasar al paso 2.
+
+## Paso 2 · Subir la revisión a la web
+
+**Hasta que no hagas esto, el QR del plano no funciona en obra.** El plano ya lleva el
+QR impreso, pero la web todavía no sabe que esa revisión existe: al escanearlo saldría
+«CÓDIGO NO VÁLIDO».
+
+1. **Doble clic en `publicar.bat`.**
+2. Te enseña qué revisiones va a publicar y te pide confirmación. Escribe `S` e Intro.
+3. La web tarda uno o dos minutos en actualizarse. A partir de ahí, los QR responden.
+
+Si el envío falla —sin conexión, por ejemplo— te avisa expresamente de que **los QR
+todavía no funcionan** y de que hay que volver a ejecutarlo. No se queda callado.
 
 ## Las tres reglas que hay que respetar
 
-**1. Solo se imprime lo que ha pasado por la herramienta.**
+**1. Solo se imprime lo que ha pasado por `emitir.bat`.**
 Un plano sin QR no se puede comprobar en obra, y ese es justo el problema que estamos
 resolviendo. Si un plano sale a obra sin pasar por aquí, el sistema no ha fallado: se
 ha esquivado.
 
-**2. Una revisión nueva es una pasada nueva por la herramienta.**
-Cada vez que se emite una revisión, se vuelve a pasar el PDF. La herramienta le pone el
-QR nuevo y marca la anterior como superada automáticamente. No hay que ir a cambiar
-nada a mano en ningún sitio.
+**2. Una revisión nueva es una pasada nueva.**
+Cada vez que se emite una revisión, se vuelve a arrastrar el PDF. La herramienta marca
+la anterior como superada automáticamente. No hay que cambiar nada a mano en ningún
+sitio.
 
-**3. Publicar es un acto deliberado.**
-El sistema **no** vigila carpetas ni publica cosas por su cuenta. Nada se convierte en
-«vigente» porque hayas guardado un archivo. Esto es intencionado: evita que un borrador
+**3. Emitir y publicar son dos actos, y los dos son deliberados.**
+El sistema **no** vigila carpetas ni publica nada por su cuenta. Nada se convierte en
+«vigente» porque hayas guardado un archivo. Es intencionado: evita que un borrador
 subido por error aparezca en obra como plano bueno.
 
 ## Lo que no debes hacer
 
-- **No subas planos al repositorio de código.** El repositorio del proyecto es público
-  en internet. Los planos van a SharePoint, nunca al repositorio. Las carpetas de
-  muestras y de salida están excluidas expresamente por este motivo.
-- **No renombres a mano un PDF que ya lleva QR.** El QR apunta a un código concreto; el
-  nombre del fichero es indiferente para el sistema, pero cambiarlo genera confusión al
-  cotejar.
+- **No subas planos al repositorio de código.** Es público en internet. Los planos van
+  a SharePoint. Las carpetas `muestras` y `salida` están excluidas por este motivo.
+- **No muevas `index.html` ni `planos.json` a una subcarpeta.** Parecen sueltos en la
+  raíz y da la tentación de ordenarlos, pero GitHub Pages publica la raíz: moverlos
+  cambiaría la dirección de la web y **dejaría de funcionar todo el papel que haya en
+  obra**.
 - **No reutilices el número de un documento anulado.** La herramienta no lo hará sola,
   pero conviene saber por qué: un QR antiguo apuntaría a un documento distinto, que es
   el peor fallo posible en un sistema de este tipo.
+
+## Si algo va mal
+
+| Síntoma | Qué significa |
+|---|---|
+| «MODO PRUEBA» al emitir | Falta `url_base` en `config/config.yaml`. Los planos saldrán marcados como PRUEBA y no valen para obra |
+| «la revisión R00 ya está registrada» | Esa revisión ya se emitió. Si de verdad hay que rehacerla, avisa: hay que retirarla del registro a mano y a conciencia, porque su QR puede estar ya impreso |
+| «el módulo del QR sale de 0,54 mm» | Es un aviso, no un error. Se ha comprobado que a ese tamaño se lee bien. Solo importaría si alguien alargase la dirección de la web |
+| `publicar.bat` dice que no hay nada | No se ha emitido nada nuevo desde la última publicación |
+| En obra sale «CÓDIGO NO VÁLIDO» en un plano recién emitido | Falta el paso 2: no se ha publicado |
 
 ---
 
@@ -175,9 +210,9 @@ No. La página solo dice si está vigente o superado. Los planos no están en la
 siguen en SharePoint, con sus permisos de siempre.
 
 **¿Queda registrado quién escanea?**
-No. Tal como está diseñado hoy, la página no guarda ningún dato de quién consulta ni
-desde dónde. Si en el futuro se quisiera registrar los escaneos habría que añadir una
-pieza más al sistema, y sería una decisión consciente y documentada.
+No. La página no guarda ningún dato de quién consulta ni desde dónde, y **no llama a
+ningún servicio externo**: ni Google, ni analítica, ni nada. Todo lo que carga sale del
+propio sitio de INES.
 
 **¿Y los planos que ya están en obra sin QR?**
 Darán «CÓDIGO NO VÁLIDO» o simplemente no tendrán QR que escanear. Todavía hay que
@@ -193,6 +228,11 @@ No pasa nada. Los QR ya impresos siguen siendo válidos. El sistema está diseñ
 expresamente para soportarlo, y esa fue una de las decisiones de diseño más importantes
 que se tomaron.
 
+**¿Cómo se añade una obra nueva?**
+No hay que preparar nada. La primera vez que emitas un plano de esa obra, `emitir.bat`
+te pedirá su código, su nombre y su expediente, y la da de alta sola. Aparecerá como un
+bloque nuevo en el listado de la web.
+
 ---
 
 # Vocabulario
@@ -205,8 +245,10 @@ que se tomaron.
 | **Vigente** | La última revisión emitida. Es la única que se debe usar |
 | **Superado** | Una revisión que ha sido sustituida por otra posterior |
 | **Nº de índice** | El número que el documento tiene en el índice de planos. Puede cambiar si se reordena el índice |
-| **Correlativo** | El número interno del código QR (`014`). No cambia nunca. No es el número de índice |
-| **Registro** | El listado de documentos y revisiones que alimenta la web pública |
+| **Correlativo** | El número interno del código QR (`101`). No cambia nunca. No es el número de índice |
+| **Registro** | El fichero `planos.json` con los documentos y revisiones, que alimenta la web |
+| **Emitir** | Meter el QR en el PDF y anotar la revisión. Paso 1 |
+| **Publicar** | Subir el registro a la web para que los QR respondan. Paso 2 |
 
 ---
 
